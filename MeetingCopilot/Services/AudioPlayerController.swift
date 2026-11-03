@@ -10,7 +10,7 @@ final class AudioPlayerController: NSObject, ObservableObject, AVAudioPlayerDele
     @Published var errorMessage: String?
 
     private var player: AVAudioPlayer?
-    private var timer: Timer?
+    private var timerTask: Task<Void, Never>?
 
     func load(url: URL?) {
         stopTimer()
@@ -85,18 +85,17 @@ final class AudioPlayerController: NSObject, ObservableObject, AVAudioPlayerDele
 
     private func startTimer() {
         stopTimer()
-        let timer = Timer(timeInterval: 0.1, repeats: true) { [weak self] _ in
-            Task { @MainActor in
+        timerTask = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .milliseconds(100))
                 guard let self, let player = self.player else { return }
                 self.currentTime = player.currentTime
             }
         }
-        RunLoop.main.add(timer, forMode: .common)
-        self.timer = timer
     }
 
     private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
+        timerTask?.cancel()
+        timerTask = nil
     }
 }

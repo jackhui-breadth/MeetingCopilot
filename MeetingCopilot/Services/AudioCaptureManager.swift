@@ -355,7 +355,7 @@ final class AudioCaptureManager: ObservableObject {
 
     private var activeSession: AudioEngineSession?
     private var rawURL: URL?
-    private var timer: Timer?
+    private var timerTask: Task<Void, Never>?
     private var noiseReductionEnabled = true
 
     init() {
@@ -473,8 +473,8 @@ final class AudioCaptureManager: ObservableObject {
             )
         }
 
-        timer?.invalidate()
-        timer = nil
+        timerTask?.cancel()
+        timerTask = nil
         activeSession?.stop()
         activeSession = nil
         self.rawURL = nil
@@ -506,15 +506,16 @@ final class AudioCaptureManager: ObservableObject {
     }
 
     private func startTimer() {
-        timer?.invalidate()
-        let timer = Timer(timeInterval: 0.25, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                guard let self, self.isRecording, !self.isPaused else { return }
-                self.elapsedSeconds += 0.25
+        timerTask?.cancel()
+        timerTask = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .milliseconds(250))
+                guard let self, self.isRecording else { return }
+                if !self.isPaused {
+                    self.elapsedSeconds += 0.25
+                }
             }
         }
-        RunLoop.main.add(timer, forMode: .common)
-        self.timer = timer
     }
 
     private static func supportsExplicitRouting(_ device: AudioInputDevice) -> Bool {
