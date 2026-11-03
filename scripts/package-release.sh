@@ -17,7 +17,9 @@ version=$(/usr/libexec/PlistBuddy \
 
 release_dir="$task_root/release"
 mkdir -p "$release_dir"
-rm -f "$release_dir"/*.zip "$release_dir"/SHA256SUMS.txt
+find "$release_dir" -maxdepth 1 -type f \
+    \( -name '*.zip' -o -name 'SHA256SUMS.txt' \) \
+    -delete
 
 app_archive="$release_dir/MeetingCopilot-$version-macOS-arm64-unsigned.zip"
 ditto -c -k --sequesterRsrc --keepParent \
