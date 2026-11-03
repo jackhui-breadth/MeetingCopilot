@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: macos-14
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: brew install ffmpeg
+      - name: Build and test Swift
+        run: swift test
+      - name: Test Python pipeline helpers
+        run: python3 -m unittest discover -s scripts/tests -v
+      - name: Check Python syntax
+        run: python3 -m py_compile MeetingCopilot/Resources/Scripts/process_meeting.py
