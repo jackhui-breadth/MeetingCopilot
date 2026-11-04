@@ -8,6 +8,20 @@
 
 > 当前是开发者预览版。语音模型不随源码分发，首次使用时需要单独下载。
 
+## 界面预览
+
+### 项目、录音与时间戳逐字稿
+
+![MeetingCopilot workspace](docs/assets/workspace.png)
+
+### 结构化会议纪要、行动项和提醒事项同步
+
+![MeetingCopilot minutes](docs/assets/minutes.png)
+
+### 现场录音与麦克风输入
+
+<img src="docs/assets/recording.png" alt="MeetingCopilot recording" width="720">
+
 ## 功能
 
 - 原生 SwiftUI 三栏界面：项目、会议时间线和会议详情
